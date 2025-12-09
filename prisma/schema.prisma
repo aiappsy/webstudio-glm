@@ -13,6 +13,7 @@ model User {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   name       String?
+  openRouterApiKey String? // User's personal OpenRouter API key
   sessions   Session[]
   workspaces Workspace[]
 }
