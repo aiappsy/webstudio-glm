@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  app:
+    image: node:18-alpine
+    working_dir: /app
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: >
+      sh -c "npm install --only=production &&
+             npm run build &&
+             npm start"
+
+volumes:
+  node_modules:

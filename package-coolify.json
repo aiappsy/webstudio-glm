@@ -1,0 +1,31 @@
+{
+  "name": "aiappsy-web-studio",
+  "version": "1.0.0",
+  "description": "Complete web development environment in browser",
+  "main": "server.js",
+  "scripts": {
+    "start": "next start",
+    "build": "next build",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "15.3.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "next-auth": "^4.24.11",
+    "@prisma/client": "^6.11.1",
+    "prisma": "^6.11.1",
+    "@next-auth/prisma-adapter": "^1.0.7",
+    "@monaco-editor/react": "^4.6.0",
+    "@xterm/xterm": "^5.3.0",
+    "@xterm/addon-fit": "^0.8.0",
+    "monaco-editor": "^0.52.0",
+    "jszip": "^3.10.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
