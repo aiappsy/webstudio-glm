@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { 
   MessageCircle, 
   Code, 
@@ -17,7 +18,10 @@ import {
   Bot,
   User,
   Loader2,
-  Settings
+  Settings,
+  Key,
+  AlertTriangle,
+  ExternalLink
 } from "lucide-react"
 import { toast } from "sonner"
 import ModelSelector from "./ModelSelector"
@@ -40,12 +44,29 @@ export default function AIAssistant({ projectId, currentCode, currentLanguage, o
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState<'chat' | 'complete' | 'generate' | 'debug'>('chat')
+  const [activeTab, setActiveTab] = useState<'chat' | 'complete' | 'generate'>('chat')
   const [codePrompt, setCodePrompt] = useState("")
   const [generatedCode, setGeneratedCode] = useState("")
   const [selectedModel, setSelectedModel] = useState(process.env.OPENROUTER_MODEL || 'deepseek/deepseek-r1:free')
   const [showModelSelector, setShowModelSelector] = useState(false)
+  const [apiKeyStatus, setApiKeyStatus] = useState<{ hasApiKey: boolean } | null>(null)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    checkApiKeyStatus()
+  }, [])
+
+  const checkApiKeyStatus = async () => {
+    try {
+      const response = await fetch('/api/user/api-key')
+      if (response.ok) {
+        const data = await response.json()
+        setApiKeyStatus(data)
+      }
+    } catch (error) {
+      console.error('Error checking API key status:', error)
+    }
+  }
 
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
@@ -56,6 +77,14 @@ export default function AIAssistant({ projectId, currentCode, currentLanguage, o
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  const handleApiError = (error: any) => {
+    if (error?.error === "API key required") {
+      toast.error("API key required. Please set up your OpenRouter API key in settings.")
+    } else {
+      toast.error(error?.error || "AI request failed")
+    }
+  }
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return
@@ -95,7 +124,8 @@ export default function AIAssistant({ projectId, currentCode, currentLanguage, o
 
         setMessages(prev => [...prev, assistantMessage])
       } else {
-        toast.error('Failed to get AI response')
+        const error = await response.json()
+        handleApiError(error)
       }
     } catch (error) {
       console.error('Error sending message:', error)
@@ -127,7 +157,8 @@ export default function AIAssistant({ projectId, currentCode, currentLanguage, o
         onCodeGenerated?.(data.code)
         toast.success('Code generated successfully!')
       } else {
-        toast.error('Failed to generate code')
+        const error = await response.json()
+        handleApiError(error)
       }
     } catch (error) {
       console.error('Error generating code:', error)
@@ -158,7 +189,8 @@ export default function AIAssistant({ projectId, currentCode, currentLanguage, o
         onCodeGenerated?.(data.completion)
         toast.success('Code completion generated!')
       } else {
-        toast.error('Failed to complete code')
+        const error = await response.json()
+        handleApiError(error)
       }
     } catch (error) {
       console.error('Error completing code:', error)
@@ -166,6 +198,80 @@ export default function AIAssistant({ projectId, currentCode, currentLanguage, o
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Show API key setup prompt if no API key is configured
+  if (apiKeyStatus && !apiKeyStatus.hasApiKey) {
+    return (
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Bot className="h-5 w-5" />
+            AI Assistant
+          </CardTitle>
+        </CardHeader>
+        
+        <CardContent className="flex-1 p-0">
+          <div className="flex-1 p-6">
+            <Alert className="mb-4">
+              <Key className="h-4 w-4" />
+              <AlertDescription className="space-y-2">
+                <div className="font-medium">API Key Required</div>
+                <div className="text-sm">
+                  To use AI features, you need to set up your OpenRouter API key.
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <span>Get your API key from:</span>
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 text-sm"
+                    asChild
+                  >
+                    <a
+                      href="https://openrouter.ai/keys"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1"
+                    >
+                      OpenRouter.ai
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </Button>
+                </div>
+              </AlertDescription>
+            </Alert>
+
+            <div className="space-y-4">
+              <div className="text-sm text-muted-foreground">
+                <p className="mb-2">Your API key is:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Stored securely and encrypted</li>
+                  <li>Used only for your AI requests</li>
+                  <li>Never shared with other users</li>
+                  <li>Required for chat, code completion, and generation</li>
+                </ul>
+              </div>
+
+              <div className="text-sm">
+                <p className="font-medium mb-1">How to get your API key:</p>
+                <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+                  <li>Sign up at <a href="https://openrouter.ai" target="_blank" rel="noopener noreferrer" className="text-primary underline">OpenRouter.ai</a></li>
+                  <li>Navigate to the API Keys section</li>
+                  <li>Create a new API key</li>
+                  <li>Copy and paste it in the settings</li>
+                </ol>
+              </div>
+
+              <div className="pt-2">
+                <p className="text-sm text-muted-foreground">
+                  After setting up your API key, AI features will be available here.
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (

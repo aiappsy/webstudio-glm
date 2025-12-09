@@ -1,9 +1,7 @@
 import { NextAuthOptions } from "next-auth"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { db } from "@/lib/db"
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(db),
   providers: [
     {
       id: "credentials",
@@ -44,6 +42,28 @@ export const authOptions: NextAuthOptions = {
     signIn: "/auth/signin",
   },
   session: {
-    strategy: "database"
-  }
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+        token.email = user.email
+        token.name = user.name
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user = {
+          id: token.id as string,
+          email: token.email as string,
+          name: token.name as string
+        }
+      }
+      return session
+    }
+  },
+  secret: process.env.NEXTAUTH_SECRET
 }
