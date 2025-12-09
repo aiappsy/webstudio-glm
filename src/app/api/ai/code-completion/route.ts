@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import OpenRouterService from "@/lib/openrouter"
+import { db } from "@/lib/db"
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,14 +17,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Code and language are required" }, { status: 400 })
     }
 
-    // Get OpenRouter API key from environment
-    const openRouterKey = process.env.OPENROUTER_API_KEY
-    if (!openRouterKey) {
-      return NextResponse.json({ error: "OpenRouter API key not configured" }, { status: 500 })
+    // Get user's OpenRouter API key from database
+    const user = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: { openRouterApiKey: true }
+    })
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    }
+
+    if (!user.openRouterApiKey) {
+      return NextResponse.json({ 
+        error: "API key required",
+        message: "Please set up your OpenRouter API key in settings to use AI features"
+      }, { status: 400 })
     }
 
     const openRouter = new OpenRouterService({
-      apiKey: openRouterKey
+      apiKey: user.openRouterApiKey
     })
 
     const completion = await openRouter.codeCompletion({
