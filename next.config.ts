@@ -22,6 +22,19 @@ const nextConfig: NextConfig = {
   env: {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
   },
+  // Add middleware for JWT authentication
+  async rewrites() {
+      return [
+        {
+          source: '/api/ai/:path*',
+          destination: '/api/ai/:path*',
+        },
+        {
+          source: '/api/ai/:path*',
+          destination: '/api/ai/:path*',
+        },
+      ]
+    },
 };
 
 export default nextConfig;
