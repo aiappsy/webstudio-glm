@@ -4,7 +4,7 @@ import { db } from "@/lib/db"
 export async function GET() {
   try {
     // Test database connection
-    const userCount = await db.user.count()
+    await db.user.findFirst()
     
     // Check environment variables
     const envStatus = {
@@ -15,15 +15,21 @@ export async function GET() {
     }
     
     return NextResponse.json({
-      message: "Debug test successful",
-      userCount,
-      env: envStatus
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      environment: envStatus,
+      uptime: process.uptime(),
+      version: process.env.npm_package_version || 'unknown'
     })
   } catch (error) {
-    console.error('Debug endpoint error:', error)
-    return NextResponse.json({ 
-      error: error.message,
-      timestamp: new Date().toISOString()
-    }, { status: 500 })
+    console.error('Health check failed:', error)
+    return NextResponse.json(
+      { 
+        status: 'unhealthy',
+        error: error.message,
+        timestamp: new Date().toISOString()
+      },
+      { status: 500 }
+    )
   }
 }
