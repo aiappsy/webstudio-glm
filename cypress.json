@@ -1,0 +1,28 @@
+{
+  "fileServerFolder": ".",
+  "fixturesFolder": "cypress/fixtures",
+  "integrationFolder": "cypress/integration",
+  "supportFile": "cypress/support/index.js",
+  "pluginsFile": "cypress/plugins/index.js",
+  "screenshotsFolder": "cypress/screenshots",
+  "videosFolder": "cypress/videos",
+  "downloadsFolder": "cypress/downloads",
+  "chromeWebSecurity": false,
+  "viewportWidth": 1280,
+  "viewportHeight": 720,
+  "video": true,
+  "videoCompression": 32,
+  "defaultCommandTimeout": 8000,
+  "requestTimeout": 8000,
+  "responseTimeout": 8000,
+  "pageLoadTimeout": 30000,
+  "execTimeout": 8000,
+  "taskTimeout": 8000,
+  "specPattern": "cypress/integration/**/*.cy.{js,jsx,ts,tsx}",
+  "ignoreTestFiles": "**/node_modules/**",
+  "baseUrl": "http://localhost:3000",
+  "testFiles": "**/*.{feature,spec,test}.{js,jsx,ts,tsx}",
+  "env": {
+    "baseUrl": "http://localhost:3000"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "schema": "./src/api/schema.json",
+  "api": "./src/api/api.json",
+  "reference": "./src/api/reference.json",
+  "hooks": "./src/api/hooks.js"
+}

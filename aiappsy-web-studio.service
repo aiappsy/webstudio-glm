@@ -1,0 +1,18 @@
+[Unit]
+Description=AiAppsy Web Studio
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/app
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=10
+Environment=NODE_ENV=production
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aiappsy-web-studio
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,16 @@
+{
+  "uid": "www-data",
+  "script": "npm start",
+  "sourceDir": ".",
+  "logFile": "./logs/forever.log",
+    "outFile": "./logs/forever.out.log",
+    "pidFile": "./logs/forever.pid",
+    "watch": true,
+    "watchDirectory": "./src",
+    "ignoreDirectory": ["node_modules", ".next"],
+    "env": {
+      "NODE_ENV": "production"
+    },
+    "max_restarts": 10,
+    "min_uptime": "10s"
+}

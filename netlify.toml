@@ -1,0 +1,18 @@
+[build]
+  publish = "out"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[context.production.environment]
+  NODE_ENV = "production"
+  NEXTAUTH_SECRET = "@nextauth-secret"
+  DATABASE_URL = "@database-url"
+  OPENROUTER_API_KEY = "@openrouter-api-key"
+  NEXTAUTH_URL = "@nextauth-url"

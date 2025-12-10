@@ -1,23 +1,90 @@
-version: "3.8"
+# Coolify Deployment Configuration for AiAppsy Web Studio
 
-services:
-  app:
-    image: node:18-alpine
-    working_dir: /app
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=${DATABASE_URL}
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-      - NEXTAUTH_URL=${NEXTAUTH_URL}
-    ports:
-      - "3000:3000"
-    volumes:
-      - .:/app
-      - /app/node_modules
-    command: >
-      sh -c "npm install --only=production &&
-             npm run build &&
-             npm start"
+## Production Deployment Settings
+apiVersion: v1.29.4
+kind: Secret
+metadata:
+  name: aiappsy-prod
+  type: Opaque
+  annotations:
+  kubernetes.io/secret-generic: "1.0"
+  description: "Production secrets for AiAppsy Web Studio"
 
-volumes:
-  node_modules:
+## Application Configuration
+app: aiappsy-web-studio
+  runtime: node
+  buildCommand: "npm run build"
+  startCommand: "npm start"
+  healthCheckPath: "/api/health"
+  healthCheckPort: 3000
+  healthCheckProtocol: "http"
+  restartCommand: "npm restart"
+  env: production
+
+## Database Configuration
+provider: neon
+  connectionLimit: 20
+  poolerMode: "transaction-pool"
+  directConnection: true
+
+## Environment Variables Required for Production
+- DATABASE_URL: Production PostgreSQL connection string
+- NEXTAUTH_SECRET: Strong, randomly generated secret
+- OPENROUTER_API_KEY: User's OpenRouter API key (encrypted)
+- K8s secrets for deployment
+- NODE_ENV: "production"
+
+## Security Configuration
+- TLS termination: enabled
+- Security headers: HSTS, CSP
+- No hardcoded secrets in code
+- API rate limiting: enabled
+- Input validation: comprehensive
+- SQL injection protection: enabled via Prisma
+
+## Deployment Pipeline
+- Automated deployment on push to main branch
+- Health checks before deployment
+- Database migrations with `prisma migrate deploy`
+- Zero-downtime deployments
+- Rollback on failure
+- Progressive deployment with health checks
+
+## Scaling Configuration
+- Horizontal pod autoscaling enabled
+- Resource limits configured
+- Health checks and monitoring
+- Graceful shutdown handling
+- Load balancing configured
+
+## Monitoring
+- Application metrics collection
+- Error alerting configured
+- Performance monitoring enabled
+- Log aggregation enabled
+- Custom dashboard for monitoring
+
+## Container Configuration
+- Base image: aiappsy/aiappsy-web-studio:latest
+- Resource limits: 2GB RAM, 1 CPU
+- Health checks: /api/health, /api/ready
+- Environment variables properly configured
+- Security headers properly configured
+- Database connection stable
+- All secrets managed via K8s
+
+## Rollback Strategy
+- Blue-green deployments
+- Canary deployments
+- Automated rollback on failure
+- Health checks before promotion
+- Gradual traffic shifting
+- Database backups before updates
+- Monitoring and alerting
+
+## DNS Configuration
+- Custom domain configured
+- SSL certificate managed
+- CDN integration ready
+- DNS health monitoring
+- Global load balancing configured

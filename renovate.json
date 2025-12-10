@@ -1,0 +1,57 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "automerge": true,
+  "automergeType": "pr",
+  "assignees": [
+    "renovate[bot]"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "dependencyDashboard": true,
+  "dependencyDashboardApproval": false,
+  "vulnerabilityAlerts": {
+    "enabled": true
+  },
+  "schedule": [
+    "before 5am on monday"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "*"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "all dependencies",
+      "groupSlug": "all"
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "performUpdates": true
+  },
+  "prConcurrentLimit": 3,
+  "prHourlyLimit": 2,
+  "rangeStrategy": "bump",
+  "rebaseWhen": "behind-base-branch",
+  "rebaseStaleDays": 7,
+  "reviewers": [
+    "aiappsy-team"
+  ],
+  "semanticCommits": true,
+  "semanticCommitScope": "fix",
+  "timezone": "America/New_York",
+  "travis": {
+    "enabled": false
+  },
+  "updateNotScheduled": [
+    "@types/*",
+    "typescript",
+    "next"
+  ]
+}
